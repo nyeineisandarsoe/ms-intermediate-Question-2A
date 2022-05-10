@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
-
+using System.Net;
 
 namespace Producer.Controllers
 {
@@ -18,17 +18,17 @@ namespace Producer.Controllers
     {
 
         [HttpPost]
-        async public void Post([FromBody] User user)
+        async public void Post()
         {
             //get token
             string token = await getToken();
 
             var factory = new ConnectionFactory()
             {
-                //HostName = "localhost" , 
-                //Port = 30724
-                HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
-                Port = Convert.ToInt32(Environment.GetEnvironmentVariable("RABBITMQ_PORT"))
+                HostName = "localhost" , 
+                Port = 5672
+                //HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
+                //Port = Convert.ToInt32(Environment.GetEnvironmentVariable("RABBITMQ_PORT"))
             };
 
             Console.WriteLine(factory.HostName + ":" + factory.Port);
@@ -44,10 +44,17 @@ namespace Producer.Controllers
                 string message = token;
                 var body = Encoding.UTF8.GetBytes(message);
 
-                channel.BasicPublish(exchange: "",
+                if(token != "")
+                {
+                    channel.BasicPublish(exchange: "",
                                      routingKey: "TaskQueue",
                                      basicProperties: null,
                                      body: body);
+                } else
+                {
+                    throw new System.Web.Http.HttpResponseException(HttpStatusCode.Unauthorized);
+                }
+                
             }
         }
 
@@ -55,7 +62,7 @@ namespace Producer.Controllers
         {
             var values = new Dictionary<string, string>
               {
-                  { "email", "eve.holt@reqres.in" },
+                  { "email", "eeeve.holt@reqres.in" },
                   { "password", "pistol" },
                   { "task", "Any Task" }
               };
