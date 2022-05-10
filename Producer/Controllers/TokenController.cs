@@ -62,7 +62,7 @@ namespace Producer.Controllers
         {
             var values = new Dictionary<string, string>
               {
-                  { "email", "eeeve.holt@reqres.in" },
+                  { "email", "eve.holt@reqres.in" },
                   { "password", "pistol" },
                   { "task", "Any Task" }
               };
